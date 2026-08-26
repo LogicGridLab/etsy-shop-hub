@@ -59,7 +59,7 @@ export const fmtNumber = (n: number) => new Intl.NumberFormat("en-US").format(Ma
 
 export const fmtPct = (n: number) => `${n.toFixed(2)}%`;
 
-async function fetchPaged<T>(table: string, orderBy?: { col: string; asc: boolean }): Promise<T[]> {
+async function fetchPaged<T>(table: "shops" | "products" | "orders" | "expenses", orderBy?: { col: string; asc: boolean }): Promise<T[]> {
   const pageSize = 1000;
   const out: T[] = [];
   for (let from = 0; ; from += pageSize) {
@@ -67,7 +67,7 @@ async function fetchPaged<T>(table: string, orderBy?: { col: string; asc: boolea
     if (orderBy) q = q.order(orderBy.col, { ascending: orderBy.asc });
     const { data, error } = await q;
     if (error) throw error;
-    out.push(...((data ?? []) as T[]));
+    out.push(...((data ?? []) as unknown as T[]));
     if (!data || data.length < pageSize) break;
   }
   return out;
@@ -80,16 +80,7 @@ export async function fetchAllData(): Promise<ShopData> {
     fetchPaged<Order>("orders", { col: "date", asc: false }),
     fetchPaged<Expense>("expenses", { col: "date", asc: false }),
   ]);
-  if (shops.error) throw shops.error;
-  if (products.error) throw products.error;
-  if (orders.error) throw orders.error;
-  if (expenses.error) throw expenses.error;
-  return {
-    shops: (shops.data ?? []) as Shop[],
-    products: (products.data ?? []) as Product[],
-    orders: (orders.data ?? []) as Order[],
-    expenses: (expenses.data ?? []) as Expense[],
-  };
+  return { shops, products, orders, expenses };
 }
 
 /** Simulated sync: pulls a fresh batch of "Etsy" activity into the DB. */
