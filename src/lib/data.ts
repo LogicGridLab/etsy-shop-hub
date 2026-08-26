@@ -59,12 +59,26 @@ export const fmtNumber = (n: number) => new Intl.NumberFormat("en-US").format(Ma
 
 export const fmtPct = (n: number) => `${n.toFixed(2)}%`;
 
+async function fetchPaged<T>(table: string, orderBy?: { col: string; asc: boolean }): Promise<T[]> {
+  const pageSize = 1000;
+  const out: T[] = [];
+  for (let from = 0; ; from += pageSize) {
+    let q = supabase.from(table).select("*").range(from, from + pageSize - 1);
+    if (orderBy) q = q.order(orderBy.col, { ascending: orderBy.asc });
+    const { data, error } = await q;
+    if (error) throw error;
+    out.push(...((data ?? []) as T[]));
+    if (!data || data.length < pageSize) break;
+  }
+  return out;
+}
+
 export async function fetchAllData(): Promise<ShopData> {
   const [shops, products, orders, expenses] = await Promise.all([
-    supabase.from("shops").select("*").order("created_at"),
-    supabase.from("products").select("*").range(0, 9999),
-    supabase.from("orders").select("*").order("date", { ascending: false }).range(0, 19999),
-    supabase.from("expenses").select("*").order("date", { ascending: false }).range(0, 9999),
+    fetchPaged<Shop>("shops", { col: "created_at", asc: true }),
+    fetchPaged<Product>("products"),
+    fetchPaged<Order>("orders", { col: "date", asc: false }),
+    fetchPaged<Expense>("expenses", { col: "date", asc: false }),
   ]);
   if (shops.error) throw shops.error;
   if (products.error) throw products.error;
