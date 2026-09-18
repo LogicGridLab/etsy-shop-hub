@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { filtered, isLoading } = useShops();
+  const { filtered, isLoading, isDemo, plan, openUpgrade, restartOnboarding } = useShops();
 
   const kpis = useMemo(() => {
     if (!filtered) return null;
