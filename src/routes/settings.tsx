@@ -40,6 +40,12 @@ function SettingsPage() {
   async function addShop(e: React.FormEvent) {
     e.preventDefault();
     if (!shopName.trim()) return;
+    if (plan === "free" && (data?.shops.length ?? 0) >= FREE_SHOP_LIMIT) {
+      setAddOpen(false);
+      setUpgradeOpen(true);
+      toast.info(`The Free plan covers ${FREE_SHOP_LIMIT} shop — upgrade to Pro for unlimited shops.`);
+      return;
+    }
     const { error } = await supabase.from("shops").insert({ shop_name: shopName.trim(), api_key: apiKey.trim() || null });
     if (error) {
       toast.error(error.message);
