@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Database, KeyRound, Link2, Plus, RefreshCw, Trash2, Webhook } from "lucide-react";
+import { Database, KeyRound, Link2, Plus, RefreshCw, ShoppingBag, Sparkles, Trash2, Webhook } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,9 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { useShops } from "@/lib/shop-context";
+import { FREE_HISTORY_DAYS, FREE_SHOP_LIMIT, useShops } from "@/lib/shop-context";
 import { simulateSync } from "@/lib/data";
+import { LEMON_CHECKOUT_URL, openCheckout } from "@/lib/billing";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -169,6 +170,41 @@ function SettingsPage() {
               </Button>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="h-4 w-4 text-primary" />
+            Plan & Billing
+          </CardTitle>
+          <CardDescription>
+            Free includes {FREE_SHOP_LIMIT} shop and {FREE_HISTORY_DAYS} days of history. Pro unlocks unlimited shops and
+            your full history — $29/mo, or $19 one-time during launch.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant={plan === "pro" ? "default" : "secondary"} className="text-[10px] uppercase">
+              {plan} plan
+            </Badge>
+            <Button size="sm" className="gap-2" onClick={() => openCheckout("lifetime") || setUpgradeOpen(true)}>
+              <ShoppingBag className="h-4 w-4" />
+              Get Pro — $19 lifetime
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setUpgradeOpen(true)}>
+              Compare plans
+            </Button>
+            <Button size="sm" variant="ghost" onClick={restartOnboarding}>
+              Re-run setup wizard
+            </Button>
+          </div>
+          {!LEMON_CHECKOUT_URL && (
+            <p className="text-xs text-muted-foreground">
+              Add your Lemon Squeezy checkout link as VITE_LEMON_CHECKOUT_URL to take payments.
+            </p>
+          )}
         </CardContent>
       </Card>
 
