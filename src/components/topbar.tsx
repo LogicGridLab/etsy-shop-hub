@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Check, ChevronsUpDown, FlaskConical, RefreshCw, Store } from "lucide-react";
+import { Check, ChevronsUpDown, FlaskConical, Lock, RefreshCw, Sparkles, Store } from "lucide-react";
 import { toast } from "sonner";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,9 +19,11 @@ import { ALL_SHOPS, simulateSync } from "@/lib/data";
 import { useShops } from "@/lib/shop-context";
 
 export function Topbar() {
-  const { data, selectedShop, setSelectedShop, mockMode, setMockMode, refresh } = useShops();
+  const { data, selectedShop, setSelectedShop, mockMode, setMockMode, refresh, visibleShops, isDemo, plan, openUpgrade } =
+    useShops();
   const [syncing, setSyncing] = useState(false);
 
+  const lockedShops = (data?.shops.length ?? 0) - visibleShops.length;
   const selectedName =
     selectedShop === ALL_SHOPS ? "All Shops Consolidated" : data?.shops.find((s) => s.id === selectedShop)?.shop_name ?? "Select shop";
 
