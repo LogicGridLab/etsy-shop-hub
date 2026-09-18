@@ -30,7 +30,7 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
-  const { data, refresh, mockMode, setMockMode } = useShops();
+  const { data, refresh, mockMode, setMockMode, plan, setUpgradeOpen, restartOnboarding } = useShops();
   const [addOpen, setAddOpen] = useState(false);
   const [shopName, setShopName] = useState("");
   const [apiKey, setApiKey] = useState("");
