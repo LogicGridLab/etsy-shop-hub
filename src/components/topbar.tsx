@@ -77,23 +77,42 @@ export function Topbar() {
             All Shops Consolidated
             {selectedShop === ALL_SHOPS && <Check className="h-4 w-4 text-profit" />}
           </DropdownMenuItem>
-          {data?.shops.map((s) => (
+          {visibleShops.map((s) => (
             <DropdownMenuItem key={s.id} onClick={() => setSelectedShop(s.id)} className="flex items-center justify-between">
               <span className="truncate">{s.shop_name}</span>
               {selectedShop === s.id && <Check className="h-4 w-4 text-profit" />}
             </DropdownMenuItem>
           ))}
+          {lockedShops > 0 && (
+            <DropdownMenuItem onClick={openUpgrade} className="flex items-center gap-2 text-muted-foreground">
+              <Lock className="h-3.5 w-3.5" />
+              {lockedShops} more shop{lockedShops === 1 ? "" : "s"} — upgrade to Pro
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div className="ml-auto flex items-center gap-4">
+      {isDemo && (
+        <Badge variant="secondary" className="gap-1 text-[10px] uppercase tracking-wide">
+          <FlaskConical className="h-3 w-3" />
+          Demo Data
+        </Badge>
+      )}
+
+      <div className="ml-auto flex items-center gap-3">
         <div className="hidden items-center gap-2 sm:flex">
           <Switch id="mock-mode" checked={mockMode} onCheckedChange={setMockMode} />
           <Label htmlFor="mock-mode" className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
             <FlaskConical className="h-3.5 w-3.5" />
-            Mock data
+            Demo mode
           </Label>
         </div>
+        {plan === "free" && (
+          <Button variant="outline" size="sm" className="gap-2" onClick={openUpgrade}>
+            <Sparkles className="h-4 w-4 text-primary" />
+            Upgrade
+          </Button>
+        )}
         <Button onClick={handleSync} disabled={syncing} size="sm" className="gap-2">
           <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
           {syncing ? "Syncing…" : "Sync Data Now"}
