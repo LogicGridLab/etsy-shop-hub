@@ -52,8 +52,8 @@ export function MonthlyRevenueChart({ data }: { data: ShopData }) {
         <CardTitle className="text-sm font-semibold">Revenue vs Etsy Fees vs Net Profit</CardTitle>
         <p className="text-xs text-muted-foreground">Monthly breakdown</p>
       </CardHeader>
-      <CardContent className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+      <CardContent className="h-56 w-full min-w-0 sm:h-64 xl:h-72">
+        <ResponsiveContainer width="100%" height="100%" debounce={60}>
           <BarChart data={rows} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.32 0.024 264)" vertical={false} />
             <XAxis dataKey="month" tick={{ fontSize: 11, fill: "oklch(0.68 0.02 262)" }} tickLine={false} axisLine={false} />
@@ -100,8 +100,8 @@ export function TrafficConversionChart({ data }: { data: ShopData }) {
         <CardTitle className="text-sm font-semibold">Daily Traffic & Orders Conversion</CardTitle>
         <p className="text-xs text-muted-foreground">Last 60 days</p>
       </CardHeader>
-      <CardContent className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+      <CardContent className="h-56 w-full min-w-0 sm:h-64 xl:h-72">
+        <ResponsiveContainer width="100%" height="100%" debounce={60}>
           <LineChart data={rows} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.32 0.024 264)" vertical={false} />
             <XAxis dataKey="date" tick={{ fontSize: 10, fill: "oklch(0.68 0.02 262)" }} tickLine={false} axisLine={false} interval={9} />
@@ -149,10 +149,10 @@ export function CategoryDonutChart({ data }: { data: ShopData }) {
         <CardTitle className="text-sm font-semibold">Category Sales Distribution</CardTitle>
         <p className="text-xs text-muted-foreground">By gross revenue</p>
       </CardHeader>
-      <CardContent className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+      <CardContent className="h-56 w-full min-w-0 sm:h-64 xl:h-72">
+        <ResponsiveContainer width="100%" height="100%" debounce={60}>
           <PieChart>
-            <Pie data={rows} dataKey="value" nameKey="name" innerRadius={58} outerRadius={92} paddingAngle={3} strokeWidth={0}>
+            <Pie data={rows} dataKey="value" nameKey="name" innerRadius="52%" outerRadius="82%" paddingAngle={3} strokeWidth={0}>
               {rows.map((r, i) => (
                 <Cell key={r.name} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
               ))}

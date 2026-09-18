@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { DollarSign, Percent, PiggyBank, ShoppingCart, TrendingUp } from "lucide-react";
+import { DollarSign, FlaskConical, Percent, PiggyBank, ShoppingCart, Sparkles, TrendingUp } from "lucide-react";
 import { KpiCard } from "@/components/kpi-card";
 import { CategoryDonutChart, MonthlyRevenueChart, TrafficConversionChart } from "@/components/dashboard-charts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useShops } from "@/lib/shop-context";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FREE_HISTORY_DAYS, useShops } from "@/lib/shop-context";
 import { fmtCurrency, fmtNumber, fmtPct } from "@/lib/data";
 
 export const Route = createFileRoute("/")({
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { filtered, isLoading } = useShops();
+  const { filtered, isLoading, isDemo, plan, openUpgrade, restartOnboarding } = useShops();
 
   const kpis = useMemo(() => {
     if (!filtered) return null;
@@ -61,10 +63,33 @@ function Dashboard() {
 
   return (
     <div className="space-y-6 p-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Executive Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Consolidated financial performance across your Etsy stores</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-bold">Executive Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Consolidated financial performance across your Etsy stores</p>
+        </div>
+        {plan === "free" && (
+          <Button variant="outline" size="sm" className="gap-2" onClick={openUpgrade}>
+            <Sparkles className="h-4 w-4 text-primary" />
+            Free plan · last {FREE_HISTORY_DAYS} days
+          </Button>
+        )}
       </div>
+
+      {isDemo && (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-info/40 bg-info/5 p-4 text-sm">
+          <Badge variant="secondary" className="gap-1 text-[10px] uppercase tracking-wide">
+            <FlaskConical className="h-3 w-3" />
+            Demo Data
+          </Badge>
+          <span className="text-muted-foreground">
+            No Etsy shop is connected yet — these numbers are sample data so you can explore every report.
+          </span>
+          <Button size="sm" variant="outline" className="ml-auto" onClick={restartOnboarding}>
+            Connect your shop
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard title="Gross Revenue" value={fmtCurrency(kpis.gross)} subtitle={`${fmtCurrency(kpis.fees)} Etsy fees`} icon={DollarSign} />
