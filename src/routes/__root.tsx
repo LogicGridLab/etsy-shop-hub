@@ -16,6 +16,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Topbar } from "@/components/topbar";
 import { ShopProvider } from "@/lib/shop-context";
+import { OnboardingDialog } from "@/components/onboarding-dialog";
+import { UpgradeModal } from "@/components/upgrade-modal";
+import { AppFooter } from "@/components/app-footer";
 
 function NotFoundComponent() {
   return (
@@ -138,9 +141,12 @@ function RootComponent() {
                 {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
                 <Outlet />
               </main>
+              <AppFooter />
             </div>
           </div>
         </SidebarProvider>
+        <OnboardingDialog />
+        <UpgradeModal />
         <Toaster position="bottom-right" />
       </ShopProvider>
     </QueryClientProvider>
