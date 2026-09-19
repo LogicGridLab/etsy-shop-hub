@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FlaskConical, KeyRound, Store } from "lucide-react";
+import { FlaskConical, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
