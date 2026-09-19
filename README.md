@@ -6,7 +6,7 @@ Build a modern, full-stack Etsy Multi-Shop Operations & Analytics Admin Dashboar
 
 - Shop Switcher: Top navbar dropdown allowing users to switch between multiple Etsy shops (e.g., "LogicGridStore", "DigitalHubStudio", "All Shops Consolidated").
 
-- Database Schema (Supabase integration):
+- Database Schema (Supabase integration): 
 
   - Shops: `id`, `shop_name`, `api_key`, `sync_status`, `created_at`
 
