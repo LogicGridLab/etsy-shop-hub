@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Package, Receipt, Settings, ShoppingBag, Store } from "lucide-react";
+import { BarChart3, Package, Receipt, Settings, ShoppingBag } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
