@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StockBadge } from "@/components/ui/badge-helpers";
+import { NoShopEmptyState } from "@/components/no-shop-empty-state";
 import { useShops } from "@/lib/shop-context";
 import { fmtCurrency, fmtNumber, fmtPct } from "@/lib/data";
 
@@ -30,7 +31,7 @@ function qualityColor(score: number) {
 }
 
 function ListingsPage() {
-  const { filtered, isLoading, data, selectedShop } = useShops();
+  const { filtered, isLoading, data, selectedShop, mockMode, hasConnectedShop } = useShops();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
 
@@ -46,6 +47,10 @@ function ListingsPage() {
   }, [filtered, search, status]);
 
   const showShop = selectedShop === "all";
+
+  if (!isLoading && !mockMode && (!filtered || !hasConnectedShop)) {
+    return <NoShopEmptyState />;
+  }
 
   return (
     <div className="space-y-6 p-6">

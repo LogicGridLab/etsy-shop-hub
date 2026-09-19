@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { NoShopEmptyState } from "@/components/no-shop-empty-state";
 import { useShops } from "@/lib/shop-context";
 import { fmtCurrency } from "@/lib/data";
 
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/orders")({
 const PAGE_SIZE = 15;
 
 function OrdersPage() {
-  const { filtered, isLoading } = useShops();
+  const { filtered, isLoading, mockMode, hasConnectedShop } = useShops();
   const [search, setSearch] = useState("");
   const [range, setRange] = useState("30");
   const [page, setPage] = useState(0);
@@ -70,6 +71,10 @@ function OrdersPage() {
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`Exported ${rows.length} orders to CSV.`);
+  }
+
+  if (!isLoading && !mockMode && (!filtered || !hasConnectedShop)) {
+    return <NoShopEmptyState />;
   }
 
   return (
