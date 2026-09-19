@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EtsyOps — Multi-Shop Operations & Analytics" },
+      { title: "EtsyOps - by LogicGridLab" },
       { name: "description", content: "Operations and analytics dashboard for Etsy digital product sellers: revenue, fees, profit, ad spend and listing performance across multiple shops." },
       { property: "og:title", content: "EtsyOps — Multi-Shop Operations & Analytics" },
       { property: "og:description", content: "Operations and analytics dashboard for Etsy digital product sellers." },
@@ -103,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
