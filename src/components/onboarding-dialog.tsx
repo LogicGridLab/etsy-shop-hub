@@ -35,12 +35,14 @@ export function OnboardingDialog() {
   return (
     <Dialog open={!onboarded} onOpenChange={(open) => !open && completeOnboarding()}>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-display text-xl">
-            <Store className="h-5 w-5 text-primary" />
+        <div className="flex justify-center pb-2">
+          <img src="/favicon.png" alt="EtsyOps" className="h-12 w-12 rounded-lg object-contain" />
+        </div>
+        <DialogHeader className="text-center">
+          <DialogTitle className="flex items-center justify-center gap-2 font-display text-xl">
             Connect your Etsy shop
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="mx-auto">
             Paste your Etsy Open API v3 keystring to start syncing real sales, fees and ad spend. No key yet? Explore
             everything with demo data first.
           </DialogDescription>
