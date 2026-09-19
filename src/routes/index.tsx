@@ -6,6 +6,7 @@ import { CategoryDonutChart, MonthlyRevenueChart, TrafficConversionChart } from 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { NoShopEmptyState } from "@/components/no-shop-empty-state";
 import { FREE_HISTORY_DAYS, useShops } from "@/lib/shop-context";
 import { fmtCurrency, fmtNumber, fmtPct } from "@/lib/data";
 
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { filtered, isLoading, isDemo, plan, openUpgrade, restartOnboarding } = useShops();
+  const { filtered, isLoading, isDemo, mockMode, hasConnectedShop, plan, openUpgrade, restartOnboarding } = useShops();
 
   const kpis = useMemo(() => {
     if (!filtered) return null;
@@ -48,7 +49,7 @@ function Dashboard() {
     };
   }, [filtered]);
 
-  if (isLoading || !filtered || !kpis) {
+  if (isLoading) {
     return (
       <div className="space-y-4 p-6">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -60,6 +61,12 @@ function Dashboard() {
       </div>
     );
   }
+
+  if (!mockMode && (!filtered || !hasConnectedShop)) {
+    return <NoShopEmptyState />;
+  }
+
+  if (!filtered || !kpis) return null;
 
   return (
     <div className="space-y-6 p-6">

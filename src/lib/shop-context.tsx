@@ -20,6 +20,8 @@ interface ShopContextValue {
   visibleShops: Shop[];
   /** True when the dashboard is showing simulated data rather than a connected shop. */
   isDemo: boolean;
+  /** True when at least one shop has live connection credentials. */
+  hasConnectedShop: boolean;
   plan: Plan;
   setPlan: (p: Plan) => void;
   upgradeOpen: boolean;
@@ -60,7 +62,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const data = mockMode ? mock : query.data;
 
   const connectedCount = (query.data?.shops ?? []).filter((s) => s.api_key).length;
-  const isDemo = mockMode || connectedCount === 0;
+  const hasConnectedShop = connectedCount > 0;
+  const isDemo = mockMode;
 
   const visibleShops = useMemo(() => {
     const shops = data?.shops ?? [];
@@ -101,6 +104,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     refresh: () => queryClient.invalidateQueries({ queryKey: ["shop-data"] }),
     visibleShops,
     isDemo,
+    hasConnectedShop,
     plan,
     setPlan: (p) => {
       setPlanState(p);
