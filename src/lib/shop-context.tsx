@@ -44,7 +44,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = window.localStorage.getItem("etsy-ops-mock");
-    if (saved === "1") setMockMode(true);
+    const firstVisit = window.localStorage.getItem("etsy-ops-onboarded") !== "1";
+    const shouldUseDemo = saved === "1" || (saved === null && firstVisit);
+    setMockMode(shouldUseDemo);
+    if (saved === null && firstVisit) window.localStorage.setItem("etsy-ops-mock", "1");
     const savedShop = window.localStorage.getItem("etsy-ops-shop");
     if (savedShop) setSelectedShop(savedShop);
     const savedPlan = window.localStorage.getItem("etsy-ops-plan");

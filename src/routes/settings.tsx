@@ -140,7 +140,7 @@ function SettingsPage() {
               <form onSubmit={addShop} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="shop-name">Shop name</Label>
-                  <Input id="shop-name" value={shopName} onChange={(e) => setShopName(e.target.value)} placeholder="MyDigitalShop" required />
+                  <Input id="shop-name" value={shopName} onChange={(e) => setShopName(e.target.value)} placeholder="e.g. My Shop" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="api-key">Etsy API keystring (optional)</Label>
