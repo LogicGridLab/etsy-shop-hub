@@ -14,6 +14,7 @@ export interface Product {
   title: string;
   sku: string;
   price: number;
+  unit_cost: number;
   conversion_rate: number;
   views: number;
   favorites: number;
@@ -40,6 +41,7 @@ export interface Expense {
   ad_spend: number;
   listing_fees: number;
   offsite_ad_fees: number;
+  shipping_postage: number;
   date: string;
 }
 
@@ -52,8 +54,33 @@ export interface ShopData {
 
 export const ALL_SHOPS = "all";
 
-export const fmtCurrency = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: n >= 1000 ? 0 : 2 }).format(n);
+export const CURRENCIES = [
+  { code: "USD", label: "US Dollar ($)" },
+  { code: "EUR", label: "Euro (€)" },
+  { code: "GBP", label: "British Pound (£)" },
+  { code: "CAD", label: "Canadian Dollar (CA$)" },
+] as const;
+
+export type CurrencyCode = (typeof CURRENCIES)[number]["code"];
+
+let activeCurrency: CurrencyCode = "USD";
+
+/** Sets the currency every formatter in the app renders with. */
+export function setActiveCurrency(code: CurrencyCode) {
+  activeCurrency = code;
+}
+
+export function getActiveCurrency(): CurrencyCode {
+  return activeCurrency;
+}
+
+export const fmtCurrency = (n: number, currency: CurrencyCode = activeCurrency) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: Math.abs(n) >= 1000 ? 0 : 2 }).format(n);
+
+export const currencySymbol = (currency: CurrencyCode = activeCurrency) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency })
+    .formatToParts(0)
+    .find((p) => p.type === "currency")?.value ?? "$";
 
 export const fmtNumber = (n: number) => new Intl.NumberFormat("en-US").format(Math.round(n));
 
