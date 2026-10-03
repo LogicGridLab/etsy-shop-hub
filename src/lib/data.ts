@@ -175,6 +175,7 @@ export function generateMockData(): ShopData {
         title: `Mock Digital Product ${si + 1}.${i + 1}`,
         sku: `MK-${si}${i}0`,
         price: Math.round((9 + rand() * 45) * 100) / 100,
+        unit_cost: Math.round(rand() * 3 * 100) / 100,
         conversion_rate: Math.round((2 + rand() * 5) * 100) / 100,
         views: Math.floor(3000 + rand() * 18000),
         favorites: Math.floor(200 + rand() * 1800),
@@ -213,6 +214,7 @@ export function generateMockData(): ShopData {
         ad_spend: Math.round((8 + rand() * 18) * 100) / 100,
         listing_fees: Math.round(rand() * 1.4 * 100) / 100,
         offsite_ad_fees: rand() < 0.35 ? Math.round((2 + rand() * 9) * 100) / 100 : 0,
+        shipping_postage: 0,
         date,
       });
     }
