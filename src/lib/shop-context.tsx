@@ -89,7 +89,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     };
   }, [rawData, costOverrides]);
 
-  const connectedCount = (query.data?.shops ?? []).filter((s) => s.api_key).length;
+  const connectedCount = (query.data?.shops ?? []).length;
   const hasConnectedShop = connectedCount > 0;
   const isDemo = mockMode;
 
