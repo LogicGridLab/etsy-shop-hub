@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useShops } from "@/lib/shop-context";
+import { NoShopEmptyState } from "@/components/no-shop-empty-state";
 import { fmtCurrency, fmtPct } from "@/lib/data";
 
 export const Route = createFileRoute("/expenses")({
@@ -31,14 +32,15 @@ const tooltipStyle = {
 } as const;
 
 function ExpensesPage() {
-  const { filtered, isLoading, data, selectedShop } = useShops();
+  const { filtered, isLoading, data, selectedShop, mockMode, hasConnectedShop } = useShops();
 
   const totals = useMemo(() => {
     if (!filtered) return null;
     const ads = filtered.expenses.reduce((s, e) => s + Number(e.ad_spend), 0);
     const listing = filtered.expenses.reduce((s, e) => s + Number(e.listing_fees), 0);
     const offsite = filtered.expenses.reduce((s, e) => s + Number(e.offsite_ad_fees), 0);
-    return { ads, listing, offsite, total: ads + listing + offsite };
+    const shipping = filtered.expenses.reduce((s, e) => s + Number(e.shipping_postage ?? 0), 0);
+    return { ads, listing, offsite, shipping, total: ads + listing + offsite + shipping };
   }, [filtered]);
 
   const daily = useMemo(() => {
@@ -64,6 +66,10 @@ function ExpensesPage() {
   const shopName = useMemo(() => new Map((data?.shops ?? []).map((s) => [s.id, s.shop_name])), [data]);
   const showShop = selectedShop === "all";
 
+  if (!isLoading && !mockMode && (!filtered || !hasConnectedShop)) {
+    return <NoShopEmptyState />;
+  }
+
   if (isLoading || !filtered || !totals) {
     return (
       <div className="space-y-4 p-6">
@@ -84,7 +90,7 @@ function ExpensesPage() {
         <KpiCard title="Total Expenses" value={fmtCurrency(totals.total)} subtitle="Tracked period" icon={Wallet} tone="expense" />
         <KpiCard title="Etsy Ads Spend" value={fmtCurrency(totals.ads)} subtitle={`${fmtPct(totals.total > 0 ? (totals.ads / totals.total) * 100 : 0)} of total`} icon={Megaphone} />
         <KpiCard title="Offsite Ad Fees" value={fmtCurrency(totals.offsite)} subtitle="12–15% of attributed sales" icon={Receipt} tone="info" />
-        <KpiCard title="Listing Fees" value={fmtCurrency(totals.listing)} subtitle="$0.20 per renewal" icon={Receipt} tone="profit" />
+        <KpiCard title="Listing Fees" value={fmtCurrency(totals.listing)} subtitle={`$0.20 per renewal · postage ${fmtCurrency(totals.shipping)}`} icon={Receipt} tone="profit" />
       </div>
 
       <Card className="border-border/60">
@@ -120,7 +126,7 @@ function ExpensesPage() {
           </TableHeader>
           <TableBody>
             {recent.map((e) => {
-              const total = Number(e.ad_spend) + Number(e.listing_fees) + Number(e.offsite_ad_fees);
+              const total = Number(e.ad_spend) + Number(e.listing_fees) + Number(e.offsite_ad_fees) + Number(e.shipping_postage ?? 0);
               return (
                 <TableRow key={e.id}>
                   <TableCell className="text-muted-foreground">{e.date}</TableCell>

@@ -30,10 +30,14 @@ function Dashboard() {
   const kpis = useMemo(() => {
     if (!filtered) return null;
     const gross = filtered.orders.reduce((s, o) => s + Number(o.gross_amount), 0);
-    const net = filtered.orders.reduce((s, o) => s + Number(o.net_amount), 0);
     const fees = filtered.orders.reduce((s, o) => s + Number(o.etsy_fees), 0);
-    const expenses = filtered.expenses.reduce((s, e) => s + Number(e.ad_spend) + Number(e.listing_fees) + Number(e.offsite_ad_fees), 0);
-    const profit = net - expenses;
+    const adSpend = filtered.expenses.reduce((s, e) => s + Number(e.ad_spend) + Number(e.listing_fees) + Number(e.offsite_ad_fees), 0);
+    const shipping = filtered.expenses.reduce((s, e) => s + Number(e.shipping_postage ?? 0), 0);
+    const costById = new Map(filtered.products.map((p) => [p.id, Number(p.unit_cost ?? 0)]));
+    const cogs = filtered.orders.reduce((s, o) => s + (o.product_id ? (costById.get(o.product_id) ?? 0) : 0), 0);
+    const expenses = adSpend + shipping;
+    // Net Profit = Gross Revenue - Etsy Fees - Ad Spend - Total COGS - Shipping Postage
+    const profit = gross - fees - adSpend - cogs - shipping;
     const orders = filtered.orders.length;
     const views = filtered.products.reduce((s, p) => s + p.views, 0);
     return {
@@ -45,6 +49,7 @@ function Dashboard() {
       conv: views > 0 ? (orders / views) * 100 : 0,
       fees,
       expenses,
+      cogs,
       margin: gross > 0 ? (profit / gross) * 100 : 0,
     };
   }, [filtered]);
@@ -103,7 +108,7 @@ function Dashboard() {
         <KpiCard
           title="Net Profit"
           value={fmtCurrency(kpis.profit)}
-          subtitle={`Tax reserve (30%): ${fmtCurrency(kpis.taxReserve)} · margin ${fmtPct(kpis.margin)}`}
+          subtitle={`Tax reserve (30%): ${fmtCurrency(kpis.taxReserve)} · margin ${fmtPct(kpis.margin)} · COGS ${fmtCurrency(kpis.cogs)}`}
           icon={PiggyBank}
           tone="profit"
         />

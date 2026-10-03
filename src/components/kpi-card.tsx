@@ -21,10 +21,10 @@ export function KpiCard({ title, value, subtitle, icon: Icon, tone = "default" }
   return (
     <Card className="border-border/60">
       <CardContent className="flex items-start justify-between gap-3 p-5">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</p>
-          <p className="mt-1.5 font-display text-2xl font-bold tracking-tight">{value}</p>
-          {subtitle && <p className="mt-1 truncate text-xs text-muted-foreground">{subtitle}</p>}
+          <p className="mt-1.5 break-words font-display text-2xl font-bold tracking-tight">{value}</p>
+          {subtitle && <p className="mt-1 whitespace-normal break-words text-xs leading-5 text-muted-foreground">{subtitle}</p>}
         </div>
         <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", toneStyles[tone])}>
           <Icon className="h-4.5 w-4.5" />

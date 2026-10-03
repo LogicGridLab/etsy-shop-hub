@@ -14,6 +14,7 @@ import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as ListingsRouteImport } from './routes/listings'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as EtsyCallbackRouteImport } from './routes/etsy.callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtsyCallbackRoute = EtsyCallbackRouteImport.update({
+  id: '/etsy/callback',
+  path: '/etsy/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/listings': typeof ListingsRoute
   '/orders': typeof OrdersRoute
   '/settings': typeof SettingsRoute
+  '/etsy/callback': typeof EtsyCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/listings': typeof ListingsRoute
   '/orders': typeof OrdersRoute
   '/settings': typeof SettingsRoute
+  '/etsy/callback': typeof EtsyCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,23 @@ export interface FileRoutesById {
   '/listings': typeof ListingsRoute
   '/orders': typeof OrdersRoute
   '/settings': typeof SettingsRoute
+  '/etsy/callback': typeof EtsyCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/expenses' | '/listings' | '/orders' | '/settings'
+  fullPaths:
+    '/' | '/expenses' | '/listings' | '/orders' | '/settings' | '/etsy/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/expenses' | '/listings' | '/orders' | '/settings'
-  id: '__root__' | '/' | '/expenses' | '/listings' | '/orders' | '/settings'
+  to:
+    '/' | '/expenses' | '/listings' | '/orders' | '/settings' | '/etsy/callback'
+  id:
+    | '__root__'
+    | '/'
+    | '/expenses'
+    | '/listings'
+    | '/orders'
+    | '/settings'
+    | '/etsy/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +95,7 @@ export interface RootRouteChildren {
   ListingsRoute: typeof ListingsRoute
   OrdersRoute: typeof OrdersRoute
   SettingsRoute: typeof SettingsRoute
+  EtsyCallbackRoute: typeof EtsyCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +135,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/etsy/callback': {
+      id: '/etsy/callback'
+      path: '/etsy/callback'
+      fullPath: '/etsy/callback'
+      preLoaderRoute: typeof EtsyCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +151,7 @@ const rootRouteChildren: RootRouteChildren = {
   ListingsRoute: ListingsRoute,
   OrdersRoute: OrdersRoute,
   SettingsRoute: SettingsRoute,
+  EtsyCallbackRoute: EtsyCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
