@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { validateLicense } from "@/lib/license.functions";
 import { ALL_SHOPS, fetchAllData, generateMockData, setActiveCurrency, type CurrencyCode, type Shop, type ShopData } from "@/lib/data";
 
 export type Plan = "free" | "pro";
@@ -34,6 +35,9 @@ interface ShopContextValue {
   setCurrency: (c: CurrencyCode) => void;
   /** Locally overrides product unit costs (used in demo mode). */
   setUnitCost: (productId: string, cost: number) => void;
+  /** Lemon Squeezy license state. "checking" until validated on load. */
+  licenseStatus: "none" | "checking" | "valid" | "invalid";
+  activateLicense: (key: string, email?: string) => Promise<{ ok: boolean; error?: string | null }>;
 }
 
 const ShopCtx = createContext<ShopContextValue | null>(null);
@@ -44,6 +48,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [mockMode, setMockMode] = useState(false);
   const [plan, setPlanState] = useState<Plan>("free");
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [licenseStatus, setLicenseStatus] = useState<ShopContextValue["licenseStatus"]>("none");
   const [currency, setCurrencyState] = useState<CurrencyCode>("USD");
   const [costOverrides, setCostOverrides] = useState<Record<string, number>>({});
   const [onboarded, setOnboarded] = useState(true); // assume true until hydrated to avoid SSR flash
@@ -56,8 +61,16 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     if (saved === null && firstVisit) window.localStorage.setItem("etsy-ops-mock", "1");
     const savedShop = window.localStorage.getItem("etsy-ops-shop");
     if (savedShop) setSelectedShop(savedShop);
-    const savedPlan = window.localStorage.getItem("etsy-ops-plan");
-    if (savedPlan === "pro") setPlanState("pro");
+    const savedKey = window.localStorage.getItem("etsy-ops-license");
+    if (savedKey) {
+      setLicenseStatus("checking");
+      validateLicense({ data: { license_key: savedKey, email: window.localStorage.getItem("etsy-ops-license-email") ?? "" } })
+        .then((r) => {
+          setLicenseStatus(r.valid ? "valid" : "invalid");
+          setPlanState(r.valid ? "pro" : "free");
+        })
+        .catch(() => setLicenseStatus("invalid"));
+    }
     setOnboarded(window.localStorage.getItem("etsy-ops-onboarded") === "1");
     const savedCur = window.localStorage.getItem("etsy-ops-currency") as CurrencyCode | null;
     if (savedCur) {
@@ -135,9 +148,26 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     isDemo,
     hasConnectedShop,
     plan,
-    setPlan: (p) => {
-      setPlanState(p);
-      window.localStorage.setItem("etsy-ops-plan", p);
+    setPlan: (p) => setPlanState(p),
+    licenseStatus,
+    activateLicense: async (key, email) => {
+      setLicenseStatus("checking");
+      try {
+        const r = await validateLicense({ data: { license_key: key.trim(), email: email?.trim() ?? "" } });
+        if (r.valid) {
+          window.localStorage.setItem("etsy-ops-license", key.trim());
+          if (r.email) window.localStorage.setItem("etsy-ops-license-email", r.email);
+          setPlanState("pro");
+          setLicenseStatus("valid");
+          setUpgradeOpen(false);
+          return { ok: true };
+        }
+        setLicenseStatus("invalid");
+        return { ok: false, error: r.error };
+      } catch {
+        setLicenseStatus("invalid");
+        return { ok: false, error: "Couldn't reach the license server. Please try again." };
+      }
     },
     upgradeOpen,
     openUpgrade: () => setUpgradeOpen(true),
