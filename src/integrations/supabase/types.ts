@@ -55,6 +55,36 @@ export type Database = {
           },
         ]
       }
+      licenses: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          license_key: string
+          status: string
+          validated_at: string | null
+          variant: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          license_key: string
+          status?: string
+          validated_at?: string | null
+          variant?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          license_key?: string
+          status?: string
+          validated_at?: string | null
+          variant?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
