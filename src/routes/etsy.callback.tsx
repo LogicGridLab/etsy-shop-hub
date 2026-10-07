@@ -33,9 +33,10 @@ function EtsyCallback() {
     const code = params.get("code");
     const state = params.get("state");
     const verifier = sessionStorage.getItem("etsy-pkce-verifier");
-    if (params.get("error")) return setError("Etsy connection was cancelled.");
+    if (params.get("error")) { setError("Etsy connection was cancelled."); return; }
     if (!code || !verifier || state !== sessionStorage.getItem("etsy-pkce-state")) {
-      return setError("This connection link has expired. Please try again.");
+      setError("This connection link has expired. Please try again.");
+      return;
     }
     exchange({ data: { code, verifier, redirectUri: etsyRedirectUri(), clientId: ETSY_CLIENT_ID } })
       .then(() => {
