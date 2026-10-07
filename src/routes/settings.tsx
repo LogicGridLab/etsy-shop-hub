@@ -54,7 +54,7 @@ function SettingsPage() {
       return;
     }
     const { error } = await supabase.from("shops").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(`${name} removed.`);
     refresh();
   }
@@ -62,7 +62,7 @@ function SettingsPage() {
   async function syncShop(id: string) {
     const shop = data?.shops.find((s) => s.id === id);
     if (!shop || !data) return;
-    if (mockMode) return toast.info("Demo shops refresh automatically.");
+    if (mockMode) { toast.info("Demo shops refresh automatically."); return; }
     setSyncingId(id);
     try {
       const res = await simulateSync(shop, data.products);
@@ -262,7 +262,7 @@ function ConnectShopDialog({ open, onOpenChange }: { open: boolean; onOpenChange
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) return toast.error("That file is too large (max 10 MB).");
+    if (file.size > 10 * 1024 * 1024) { toast.error("That file is too large (max 10 MB)."); return; }
     setBusy(true);
     try {
       const res = await importEtsyStatement(file, shopName);
@@ -284,7 +284,7 @@ function ConnectShopDialog({ open, onOpenChange }: { open: boolean; onOpenChange
     setBusy(true);
     const { error } = await supabase.from("shops").insert({ shop_name: name.slice(0, 100), api_key: apiKey.trim().slice(0, 500) });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(`${name} connected.`);
     setApiKey("");
     setMockMode(false);
