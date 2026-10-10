@@ -32,6 +32,10 @@ export function Topbar() {
       toast.info("Mock mode is on — simulated data is generated locally.");
       return;
     }
+    if (plan !== "pro") {
+      openUpgrade();
+      return;
+    }
     if (!data) return;
     const targets = selectedShop === ALL_SHOPS ? data.shops : data.shops.filter((s) => s.id === selectedShop);
     if (targets.length === 0) return;
@@ -73,8 +77,14 @@ export function Topbar() {
         <DropdownMenuContent align="start" className="w-60">
           <DropdownMenuLabel>Switch shop</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setSelectedShop(ALL_SHOPS)} className="flex items-center justify-between">
-            All Shops Consolidated
+          <DropdownMenuItem
+            onClick={() => (plan === "pro" || mockMode ? setSelectedShop(ALL_SHOPS) : openUpgrade())}
+            className="flex items-center justify-between"
+          >
+            <span className="flex items-center gap-2">
+              {plan !== "pro" && !mockMode && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
+              All Shops Consolidated
+            </span>
             {selectedShop === ALL_SHOPS && <Check className="h-4 w-4 text-profit" />}
           </DropdownMenuItem>
           {visibleShops.map((s) => (
@@ -114,7 +124,7 @@ export function Topbar() {
           </Button>
         )}
         <Button onClick={handleSync} disabled={syncing} size="sm" className="gap-2">
-          <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+          {plan === "pro" || mockMode ? <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} /> : <Lock className="h-4 w-4" />}
           {syncing ? "Syncing…" : "Sync Data Now"}
         </Button>
       </div>

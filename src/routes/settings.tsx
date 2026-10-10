@@ -172,7 +172,9 @@ function SettingsPage() {
                 $24 monthly, or $149 lifetime for the first 100 sellers.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap items-center gap-3">
+            <CardContent className="space-y-4">
+              <LicenseForm />
+              <div className="flex flex-wrap items-center gap-3">
               <Badge variant={plan === "pro" ? "default" : "secondary"} className="text-[10px] uppercase">
                 {plan} plan
               </Badge>
@@ -183,6 +185,7 @@ function SettingsPage() {
               <Button size="sm" variant="ghost" onClick={restartOnboarding}>
                 Re-run setup wizard
               </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -350,5 +353,39 @@ function ConnectShopDialog({ open, onOpenChange }: { open: boolean; onOpenChange
         </Accordion>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function LicenseForm() {
+  const { activateLicense, licenseStatus } = useShops();
+  const [key, setKey] = useState("");
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (key.trim().length < 8) {
+      toast.error("Please paste your full license key.");
+      return;
+    }
+    const r = await activateLicense(key);
+    if (r.ok) {
+      toast.success("License activated — EtsyOps Pro unlocked.");
+      setKey("");
+    } else toast.error(r.error ?? "This license key isn't valid.");
+  }
+
+  if (licenseStatus === "valid") {
+    return <p className="text-sm text-profit">Pro license active on this device.</p>;
+  }
+
+  return (
+    <form onSubmit={submit} className="flex flex-col gap-2 sm:flex-row sm:items-end">
+      <div className="flex-1 space-y-2">
+        <Label htmlFor="license-key">Enter License Key</Label>
+        <Input id="license-key" value={key} onChange={(e) => setKey(e.target.value)} placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" maxLength={200} />
+      </div>
+      <Button type="submit" disabled={licenseStatus === "checking"}>
+        {licenseStatus === "checking" ? "Checking…" : "Activate"}
+      </Button>
+    </form>
   );
 }
