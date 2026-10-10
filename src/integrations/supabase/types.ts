@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      connected_shops: {
+        Row: {
+          access_token_encrypted: string
+          created_at: string
+          id: string
+          refresh_token_encrypted: string
+          shop_id: number
+          shop_name: string
+          shop_ref: string | null
+          token_expires_at: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          access_token_encrypted: string
+          created_at?: string
+          id?: string
+          refresh_token_encrypted: string
+          shop_id: number
+          shop_name: string
+          shop_ref?: string | null
+          token_expires_at: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          access_token_encrypted?: string
+          created_at?: string
+          id?: string
+          refresh_token_encrypted?: string
+          shop_id?: number
+          shop_name?: string
+          shop_ref?: string | null
+          token_expires_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           ad_spend: number
