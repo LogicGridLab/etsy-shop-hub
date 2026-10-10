@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { DollarSign, FlaskConical, Percent, PiggyBank, ShoppingCart, Sparkles, TrendingUp } from "lucide-react";
 import { KpiCard } from "@/components/kpi-card";
 import { CategoryDonutChart, MonthlyRevenueChart, TrafficConversionChart } from "@/components/dashboard-charts";
@@ -25,7 +25,15 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { filtered, isLoading, isDemo, mockMode, hasConnectedShop, plan, openUpgrade, restartOnboarding } = useShops();
+  const { filtered, isLoading, isDemo, mockMode, hasConnectedShop, plan, openUpgrade, restartOnboarding, licenseStatus, onboarded } = useShops();
+
+  useEffect(() => {
+    if (!onboarded || licenseStatus === "checking" || licenseStatus === "valid") return;
+    if (sessionStorage.getItem("etsy-ops-upsell-shown") === "1") return;
+    sessionStorage.setItem("etsy-ops-upsell-shown", "1");
+    openUpgrade();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onboarded, licenseStatus]);
 
   const kpis = useMemo(() => {
     if (!filtered) return null;
