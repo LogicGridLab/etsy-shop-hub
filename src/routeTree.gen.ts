@@ -16,6 +16,9 @@ import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as EtsyCallbackRouteImport } from './routes/etsy.callback'
+import { Route as ApiEtsyCallbackRouteImport } from './routes/api/etsy/callback'
+import { Route as ApiEtsyStartRouteImport } from './routes/api/etsy/start'
+import { Route as ApiPublicEtsyTokenRefreshRouteImport } from './routes/api/public/etsy/token-refresh'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +55,22 @@ const EtsyCallbackRoute = EtsyCallbackRouteImport.update({
   path: '/etsy/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEtsyCallbackRoute = ApiEtsyCallbackRouteImport.update({
+  id: '/api/etsy/callback',
+  path: '/api/etsy/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEtsyStartRoute = ApiEtsyStartRouteImport.update({
+  id: '/api/etsy/start',
+  path: '/api/etsy/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicEtsyTokenRefreshRoute =
+  ApiPublicEtsyTokenRefreshRouteImport.update({
+    id: '/api/public/etsy/token-refresh',
+    path: '/api/public/etsy/token-refresh',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +80,9 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/welcome': typeof WelcomeRoute
   '/etsy/callback': typeof EtsyCallbackRoute
+  '/api/etsy/callback': typeof ApiEtsyCallbackRoute
+  '/api/etsy/start': typeof ApiEtsyStartRoute
+  '/api/public/etsy/token-refresh': typeof ApiPublicEtsyTokenRefreshRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +92,9 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/welcome': typeof WelcomeRoute
   '/etsy/callback': typeof EtsyCallbackRoute
+  '/api/etsy/callback': typeof ApiEtsyCallbackRoute
+  '/api/etsy/start': typeof ApiEtsyStartRoute
+  '/api/public/etsy/token-refresh': typeof ApiPublicEtsyTokenRefreshRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +105,9 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/welcome': typeof WelcomeRoute
   '/etsy/callback': typeof EtsyCallbackRoute
+  '/api/etsy/callback': typeof ApiEtsyCallbackRoute
+  '/api/etsy/start': typeof ApiEtsyStartRoute
+  '/api/public/etsy/token-refresh': typeof ApiPublicEtsyTokenRefreshRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +119,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/welcome'
     | '/etsy/callback'
+    | '/api/etsy/callback'
+    | '/api/etsy/start'
+    | '/api/public/etsy/token-refresh'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +131,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/welcome'
     | '/etsy/callback'
+    | '/api/etsy/callback'
+    | '/api/etsy/start'
+    | '/api/public/etsy/token-refresh'
   id:
     | '__root__'
     | '/'
@@ -109,6 +143,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/welcome'
     | '/etsy/callback'
+    | '/api/etsy/callback'
+    | '/api/etsy/start'
+    | '/api/public/etsy/token-refresh'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +156,9 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   WelcomeRoute: typeof WelcomeRoute
   EtsyCallbackRoute: typeof EtsyCallbackRoute
+  ApiEtsyCallbackRoute: typeof ApiEtsyCallbackRoute
+  ApiEtsyStartRoute: typeof ApiEtsyStartRoute
+  ApiPublicEtsyTokenRefreshRoute: typeof ApiPublicEtsyTokenRefreshRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +212,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EtsyCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/etsy/callback': {
+      id: '/api/etsy/callback'
+      path: '/api/etsy/callback'
+      fullPath: '/api/etsy/callback'
+      preLoaderRoute: typeof ApiEtsyCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/etsy/start': {
+      id: '/api/etsy/start'
+      path: '/api/etsy/start'
+      fullPath: '/api/etsy/start'
+      preLoaderRoute: typeof ApiEtsyStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/etsy/token-refresh': {
+      id: '/api/public/etsy/token-refresh'
+      path: '/api/public/etsy/token-refresh'
+      fullPath: '/api/public/etsy/token-refresh'
+      preLoaderRoute: typeof ApiPublicEtsyTokenRefreshRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +244,9 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   WelcomeRoute: WelcomeRoute,
   EtsyCallbackRoute: EtsyCallbackRoute,
+  ApiEtsyCallbackRoute: ApiEtsyCallbackRoute,
+  ApiEtsyStartRoute: ApiEtsyStartRoute,
+  ApiPublicEtsyTokenRefreshRoute: ApiPublicEtsyTokenRefreshRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
