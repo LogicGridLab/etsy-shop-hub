@@ -153,7 +153,7 @@ function SettingsPage() {
                       </Badge>
                     </div>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {mockMode ? "Sample data" : s.api_key ? "Connected to Etsy" : "Imported from statement"}
+                      {mockMode ? "Sample data" : s.api_key?.startsWith("etsy-oauth:") ? "Connected via Etsy" : s.api_key ? "Connected with API key" : "Imported from statement"}
                     </p>
                   </div>
                   <Button size="sm" variant="outline" className="gap-2" disabled={syncingId === s.id} onClick={() => syncShop(s.id)}>
