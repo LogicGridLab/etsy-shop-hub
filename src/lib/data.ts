@@ -112,6 +112,10 @@ export async function fetchAllData(): Promise<ShopData> {
 
 /** Simulated sync: pulls a fresh batch of "Etsy" activity into the DB. */
 export async function simulateSync(shop: Shop, products: Product[]) {
+  if (shop.api_key?.startsWith("etsy-oauth:")) {
+    const { syncEtsyShop } = await import("@/lib/etsy-sync.functions");
+    return syncEtsyShop({ data: { shopRef: shop.id } });
+  }
   const shopProducts = products.filter((p) => p.shop_id === shop.id);
   if (shopProducts.length === 0) return { orders: 0 };
 
