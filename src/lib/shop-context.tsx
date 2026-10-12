@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { validateLicense } from "@/lib/license.functions";
+import { getAdminStatus } from "@/lib/admin.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { ALL_SHOPS, fetchAllData, generateMockData, setActiveCurrency, type CurrencyCode, type Shop, type ShopData } from "@/lib/data";
 
 export type Plan = "free" | "pro";
@@ -37,7 +40,13 @@ interface ShopContextValue {
   setUnitCost: (productId: string, cost: number) => void;
   /** Lemon Squeezy license state. "checking" until validated on load. */
   licenseStatus: "none" | "checking" | "valid" | "invalid";
-  activateLicense: (key: string, email?: string) => Promise<{ ok: boolean; error?: string | null }>;
+  activateLicense: (key: string, email?: string) => Promise<{ ok: boolean; error?: string | null; admin?: boolean }>;
+  /** Signed-in user email (Google). */
+  userEmail: string | null;
+  /** True when the signed-in, verified user is in the admins table (lifetime Pro). */
+  isAdmin: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const ShopCtx = createContext<ShopContextValue | null>(null);
@@ -51,6 +60,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [licenseStatus, setLicenseStatus] = useState<ShopContextValue["licenseStatus"]>("none");
   const [currency, setCurrencyState] = useState<CurrencyCode>("USD");
   const [costOverrides, setCostOverrides] = useState<Record<string, number>>({});
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [onboarded, setOnboarded] = useState(true); // assume true until hydrated to avoid SSR flash
 
   useEffect(() => {
@@ -66,8 +77,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       setLicenseStatus("checking");
       validateLicense({ data: { license_key: savedKey, email: window.localStorage.getItem("etsy-ops-license-email") ?? "" } })
         .then((r) => {
-          setLicenseStatus(r.valid ? "valid" : "invalid");
-          setPlanState(r.valid ? "pro" : "free");
+          setLicenseStatus((cur) => (cur === "valid" ? cur : r.valid ? "valid" : "invalid"));
+          setPlanState((cur) => (cur === "pro" ? cur : r.valid ? "pro" : "free"));
         })
         .catch(() => setLicenseStatus("invalid"));
     }
@@ -82,6 +93,43 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
+  }, []);
+
+  useEffect(() => {
+    async function check() {
+      const { data: u } = await supabase.auth.getUser();
+      setUserEmail(u.user?.email ?? null);
+      if (!u.user) {
+        setIsAdmin(false);
+        return;
+      }
+      try {
+        const r = await getAdminStatus();
+        setIsAdmin(r.isAdmin);
+        if (r.isAdmin) {
+          setPlanState("pro");
+          setLicenseStatus("valid");
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+    check();
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        if (event === "SIGNED_OUT") {
+          setIsAdmin(false);
+          setUserEmail(null);
+          if (!window.localStorage.getItem("etsy-ops-license")) {
+            setPlanState("free");
+            setLicenseStatus("none");
+          }
+          return;
+        }
+        setTimeout(check, 0);
+      }
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   const query = useQuery({
@@ -150,7 +198,22 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     plan,
     setPlan: (p) => setPlanState(p),
     licenseStatus,
+    userEmail,
+    isAdmin,
+    signInWithGoogle: async () => {
+      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/settings" });
+      if (r.error) throw r.error;
+    },
+    signOut: async () => {
+      await supabase.auth.signOut();
+    },
     activateLicense: async (key, email) => {
+      if (isAdmin) {
+        setPlanState("pro");
+        setLicenseStatus("valid");
+        setUpgradeOpen(false);
+        return { ok: true, admin: true };
+      }
       setLicenseStatus("checking");
       try {
         const r = await validateLicense({ data: { license_key: key.trim(), email: email?.trim() ?? "" } });

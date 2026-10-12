@@ -201,6 +201,7 @@ function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <AdminAccess />
               <LicenseForm />
               <div className="flex flex-wrap items-center gap-3">
               <Badge variant={plan === "pro" ? "default" : "secondary"} className="text-[10px] uppercase">
@@ -383,8 +384,35 @@ function ConnectShopDialog({ open, onOpenChange }: { open: boolean; onOpenChange
   );
 }
 
+function AdminAccess() {
+  const { userEmail, isAdmin, signInWithGoogle, signOut } = useShops();
+  if (isAdmin) {
+    return (
+      <div className="flex flex-wrap items-center gap-3 rounded-md border border-profit/40 bg-profit/10 p-3">
+        <Badge className="bg-profit text-background hover:bg-profit">ADMIN - Lifetime Pro</Badge>
+        <span className="text-sm text-muted-foreground">Signed in as {userEmail}. All Pro features unlocked.</span>
+        <Button size="sm" variant="ghost" className="ml-auto" onClick={signOut}>Sign out</Button>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+      {userEmail ? (
+        <>
+          <span>Signed in as {userEmail}</span>
+          <Button size="sm" variant="ghost" onClick={signOut}>Sign out</Button>
+        </>
+      ) : (
+        <Button size="sm" variant="outline" onClick={() => signInWithGoogle().catch(() => toast.error("Google sign-in failed."))}>
+          Sign in with Google
+        </Button>
+      )}
+    </div>
+  );
+}
+
 function LicenseForm() {
-  const { activateLicense, licenseStatus } = useShops();
+  const { activateLicense, licenseStatus, isAdmin } = useShops();
   const [key, setKey] = useState("");
 
   async function submit(e: React.FormEvent) {
@@ -394,12 +422,16 @@ function LicenseForm() {
       return;
     }
     const r = await activateLicense(key);
-    if (r.ok) {
+    if (r.ok && r.admin) {
+      toast.success("Admin Access Granted");
+      setKey("");
+    } else if (r.ok) {
       toast.success("License activated — EtsyOps Pro unlocked.");
       setKey("");
     } else toast.error(r.error ?? "This license key isn't valid.");
   }
 
+  if (isAdmin) return null;
   if (licenseStatus === "valid") {
     return <p className="text-sm text-profit">Pro license active on this device.</p>;
   }
