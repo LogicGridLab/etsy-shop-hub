@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Code2, Database, FileSpreadsheet, KeyRound, Link2, Plus, RefreshCw, ShoppingBag, Sparkles, Trash2, Upload, Webhook } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { FREE_HISTORY_DAYS, FREE_SHOP_LIMIT, useShops } from "@/lib/shop-context";
 import { CURRENCIES, simulateSync, type CurrencyCode } from "@/lib/data";
 import { importEtsyStatement } from "@/lib/etsy-csv";
-import { isEtsyOAuthReady, startEtsyOAuth } from "@/lib/etsy-oauth";
+import { startEtsyOAuth } from "@/lib/etsy-oauth";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -34,10 +34,34 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
-  const { data, refresh, mockMode, setMockMode, plan, setUpgradeOpen, restartOnboarding, currency, setCurrency } = useShops();
+  const { data, refresh, mockMode, setMockMode, plan, setUpgradeOpen, restartOnboarding, currency, setCurrency, completeOnboarding } = useShops();
   const [addOpen, setAddOpen] = useState(false);
   const [syncingId, setSyncingId] = useState<string | null>(null);
   const [webhooksEnabled, setWebhooksEnabled] = useState(true);
+  const etsyShops = (data?.shops ?? []).filter((s) => s.api_key?.startsWith("etsy-oauth:"));
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const connected = params.get("connected");
+    if (connected === null) return;
+    if (connected === "1") {
+      toast.success("Shop connected successfully");
+      setMockMode(false);
+      completeOnboarding();
+      refresh();
+    } else {
+      const reason = params.get("reason");
+      toast.error(
+        reason === "cancelled"
+          ? "Etsy connection was cancelled."
+          : reason === "config"
+            ? "Etsy connect isn't set up yet. Please try again later."
+            : "We couldn't connect your Etsy shop. Please try again.",
+      );
+    }
+    window.history.replaceState(null, "", "/settings");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function guardLimit() {
     if (!mockMode && plan === "free" && (data?.shops.length ?? 0) >= FREE_SHOP_LIMIT) {
@@ -100,7 +124,11 @@ function SettingsPage() {
                   Connected Shops
                 </CardTitle>
                 <CardDescription>
-                  {mockMode ? "Demo mode — showing sample shops" : `${data?.shops.length ?? 0} shops linked to this workspace`}
+                  {mockMode
+                    ? "Demo mode — showing sample shops"
+                    : etsyShops.length
+                      ? `Connected: ${etsyShops.map((s) => s.shop_name).join(", ")}`
+                      : `${data?.shops.length ?? 0} shops linked to this workspace`}
                 </CardDescription>
               </div>
               <Button size="sm" className="gap-2" onClick={() => guardLimit() && setAddOpen(true)}>
@@ -125,7 +153,7 @@ function SettingsPage() {
                       </Badge>
                     </div>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {mockMode ? "Sample data" : s.api_key ? "Connected to Etsy" : "Imported from statement"}
+                      {mockMode ? "Sample data" : s.api_key?.startsWith("etsy-oauth:") ? "Connected via Etsy" : s.api_key ? "Connected with API key" : "Imported from statement"}
                     </p>
                   </div>
                   <Button size="sm" variant="outline" className="gap-2" disabled={syncingId === s.id} onClick={() => syncShop(s.id)}>
@@ -255,10 +283,9 @@ function ConnectShopDialog({ open, onOpenChange }: { open: boolean; onOpenChange
   const [apiKey, setApiKey] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function oauth() {
-    if (!(await startEtsyOAuth())) {
-      toast.info("1-click Etsy connect is rolling out soon — import your statement CSV to get started today.");
-    }
+  function oauth() {
+    setBusy(true);
+    startEtsyOAuth();
   }
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -314,7 +341,7 @@ function ConnectShopDialog({ open, onOpenChange }: { open: boolean; onOpenChange
             <span className="flex flex-col items-start">
               <span>Connect with Etsy</span>
               <span className="text-xs font-normal text-primary-foreground/80">
-                {isEtsyOAuthReady() ? "Secure 1-click sign-in" : "Secure 1-click sign-in — coming soon"}
+                Secure 1-click sign-in
               </span>
             </span>
           </Button>
