@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as ListingsRouteImport } from './routes/listings'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as SecurityAdvisorRouteImport } from './routes/security-advisor'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as ApiEtsyCallbackRouteImport } from './routes/api/etsy/callback'
@@ -37,6 +38,11 @@ const ListingsRoute = ListingsRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityAdvisorRoute = SecurityAdvisorRouteImport.update({
+  id: '/security-advisor',
+  path: '/security-advisor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/expenses': typeof ExpensesRoute
   '/listings': typeof ListingsRoute
   '/orders': typeof OrdersRoute
+  '/security-advisor': typeof SecurityAdvisorRoute
   '/settings': typeof SettingsRoute
   '/welcome': typeof WelcomeRoute
   '/api/etsy/callback': typeof ApiEtsyCallbackRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/expenses': typeof ExpensesRoute
   '/listings': typeof ListingsRoute
   '/orders': typeof OrdersRoute
+  '/security-advisor': typeof SecurityAdvisorRoute
   '/settings': typeof SettingsRoute
   '/welcome': typeof WelcomeRoute
   '/api/etsy/callback': typeof ApiEtsyCallbackRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/expenses': typeof ExpensesRoute
   '/listings': typeof ListingsRoute
   '/orders': typeof OrdersRoute
+  '/security-advisor': typeof SecurityAdvisorRoute
   '/settings': typeof SettingsRoute
   '/welcome': typeof WelcomeRoute
   '/api/etsy/callback': typeof ApiEtsyCallbackRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/listings'
     | '/orders'
+    | '/security-advisor'
     | '/settings'
     | '/welcome'
     | '/api/etsy/callback'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/listings'
     | '/orders'
+    | '/security-advisor'
     | '/settings'
     | '/welcome'
     | '/api/etsy/callback'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/listings'
     | '/orders'
+    | '/security-advisor'
     | '/settings'
     | '/welcome'
     | '/api/etsy/callback'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   ExpensesRoute: typeof ExpensesRoute
   ListingsRoute: typeof ListingsRoute
   OrdersRoute: typeof OrdersRoute
+  SecurityAdvisorRoute: typeof SecurityAdvisorRoute
   SettingsRoute: typeof SettingsRoute
   WelcomeRoute: typeof WelcomeRoute
   ApiEtsyCallbackRoute: typeof ApiEtsyCallbackRoute
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security-advisor': {
+      id: '/security-advisor'
+      path: '/security-advisor'
+      fullPath: '/security-advisor'
+      preLoaderRoute: typeof SecurityAdvisorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExpensesRoute: ExpensesRoute,
   ListingsRoute: ListingsRoute,
   OrdersRoute: OrdersRoute,
+  SecurityAdvisorRoute: SecurityAdvisorRoute,
   SettingsRoute: SettingsRoute,
   WelcomeRoute: WelcomeRoute,
   ApiEtsyCallbackRoute: ApiEtsyCallbackRoute,
