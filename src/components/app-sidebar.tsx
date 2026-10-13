@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Package, Receipt, Settings, ShoppingBag } from "lucide-react";
+import { BarChart3, Package, Receipt, Settings, ShieldCheck, ShoppingBag } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -27,7 +27,7 @@ const items = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const { data } = useShops();
+  const { data, isAdmin } = useShops();
   const currentPath = useRouterState({ select: (r) => r.location.pathname });
 
   return (
@@ -48,7 +48,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Modules</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {[...items, ...(isAdmin ? [{ title: "Security Advisor", url: "/security-advisor", icon: ShieldCheck }] : [])].map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={currentPath === item.url} tooltip={item.title}>
                     <Link to={item.url}>
