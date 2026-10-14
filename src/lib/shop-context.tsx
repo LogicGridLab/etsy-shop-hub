@@ -201,8 +201,11 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     userEmail,
     isAdmin,
     signInWithGoogle: async () => {
-      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/settings" });
-      if (r.error) throw r.error;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin + "/auth/callback" },
+      });
+      if (error) throw error;
     },
     signOut: async () => {
       await supabase.auth.signOut();
