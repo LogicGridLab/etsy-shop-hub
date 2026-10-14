@@ -11,6 +11,7 @@ import { useShops } from "@/lib/shop-context";
 import { currencySymbol, fmtCurrency, fmtNumber, fmtPct, type Product } from "@/lib/data";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AiPremiumButton } from "@/components/ai-premium-dialog";
 
 export const Route = createFileRoute("/listings")({
   head: () => ({
@@ -94,20 +95,21 @@ function ListingsPage() {
               <TableHead className="text-right">Conv.</TableHead>
               <TableHead className="w-36">Quality</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-right">AI</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell colSpan={showShop ? 10 : 9}>
+                  <TableCell colSpan={showShop ? 11 : 10}>
                     <Skeleton className="h-5 w-full" />
                   </TableCell>
                 </TableRow>
               ))
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={showShop ? 10 : 9} className="py-10 text-center text-muted-foreground">
+                <TableCell colSpan={showShop ? 11 : 10} className="py-10 text-center text-muted-foreground">
                   No listings match your filters.
                 </TableCell>
               </TableRow>
@@ -141,6 +143,9 @@ function ListingsPage() {
                     </TableCell>
                     <TableCell>
                       <StockBadge status={p.stock_status} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <AiPremiumButton product={p} />
                     </TableCell>
                   </TableRow>
                 );
