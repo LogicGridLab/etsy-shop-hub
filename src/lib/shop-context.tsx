@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { validateLicense } from "@/lib/license.functions";
 import { getAdminStatus } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { ALL_SHOPS, fetchAllData, generateMockData, setActiveCurrency, type CurrencyCode, type Shop, type ShopData } from "@/lib/data";
 
 export type Plan = "free" | "pro";
