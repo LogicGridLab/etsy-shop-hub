@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { validateLicense } from "@/lib/license.functions";
 import { getAdminStatus } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { ALL_SHOPS, fetchAllData, generateMockData, setActiveCurrency, type CurrencyCode, type Shop, type ShopData } from "@/lib/data";
 
 export type Plan = "free" | "pro";
@@ -201,8 +200,11 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     userEmail,
     isAdmin,
     signInWithGoogle: async () => {
-      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/settings" });
-      if (r.error) throw r.error;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin + "/auth/callback" },
+      });
+      if (error) throw error;
     },
     signOut: async () => {
       await supabase.auth.signOut();
